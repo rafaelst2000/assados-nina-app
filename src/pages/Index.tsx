@@ -1,12 +1,31 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import { Navigation } from '@/components/Navigation';
+import { StockTab } from '@/components/StockTab';
+import { SalesTab } from '@/components/SalesTab';
+import { NewSaleTab } from '@/components/NewSaleTab';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('stock');
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'stock':
+        return <StockTab />;
+      case 'sales':
+        return <SalesTab />;
+      case 'new-sale':
+        return <NewSaleTab />;
+      default:
+        return <StockTab />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <main className="min-h-screen">
+        {renderActiveTab()}
+      </main>
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
