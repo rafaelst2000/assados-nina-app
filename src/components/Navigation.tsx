@@ -1,4 +1,4 @@
-import { Package, ShoppingCart, Plus } from 'lucide-react';
+import { ChefHat, Receipt, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -9,8 +9,8 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'stock', label: 'Estoque', icon: Package },
-    { id: 'sales', label: 'Vendas', icon: ShoppingCart },
+    { id: 'stock', label: 'Estoque', icon: ChefHat },
+    { id: 'sales', label: 'Vendas', icon: Receipt },
     { id: 'new-sale', label: 'Nova Venda', icon: Plus },
   ];
 

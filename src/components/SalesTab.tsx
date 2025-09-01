@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Trash2, User, Drumstick, TrendingUp } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export const SalesTab: React.FC = () => {
@@ -64,7 +64,7 @@ export const SalesTab: React.FC = () => {
     <div className="p-4 pb-20 space-y-6">
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full shadow-warm">
-          <ShoppingCart className="w-8 h-8 text-primary-foreground" />
+          <ChefHat className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">Gestão de Vendas</h1>
         <p className="text-muted-foreground">Acompanhe vendas, reservas e estoque</p>
@@ -74,7 +74,7 @@ export const SalesTab: React.FC = () => {
       <Card className="bg-gradient-card shadow-soft border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-foreground">
-            <Package className="w-5 h-5" />
+            <Drumstick className="w-5 h-5" />
             Estoque e Lucro
           </CardTitle>
         </CardHeader>

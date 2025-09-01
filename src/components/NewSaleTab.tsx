@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Plus, Minus, ShoppingCart, User, Percent } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, User, Percent, ChefHat } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { SaleItem } from '@/types';
 
@@ -98,7 +98,7 @@ export const NewSaleTab: React.FC = () => {
     <div className="p-4 pb-20 space-y-6">
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full shadow-warm">
-          <Plus className="w-8 h-8 text-primary-foreground" />
+          <ChefHat className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">Nova Venda</h1>
         <p className="text-muted-foreground">Registre uma nova venda ou reserva</p>
