@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Save, ChefHat } from 'lucide-react';
+import { Save, Package2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -26,7 +26,10 @@ export const StockTab: React.FC = () => {
       updateStock(productId, quantity);
     });
     
-    // Remove toast notification as requested
+    toast({
+      title: "Estoque atualizado!",
+      description: "Todas as quantidades foram salvas com sucesso.",
+    });
   };
 
   const formatPrice = (price: number) => {
@@ -40,7 +43,7 @@ export const StockTab: React.FC = () => {
     <div className="p-4 pb-20 space-y-6">
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full shadow-warm">
-          <ChefHat className="w-8 h-8 text-primary-foreground" />
+          <Package2 className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">Estoque dos Assados</h1>
         <p className="text-muted-foreground">Gerencie a quantidade de cada produto</p>
