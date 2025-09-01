@@ -1,30 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
 
 export const SalesTab: React.FC = () => {
   const { sales, products, updateSale, deleteSale } = useApp();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [saleToDelete, setSaleToDelete] = useState<string | null>(null);
 
   const handleMarkAsCollected = (saleId: string) => {
     updateSale(saleId, { isCollected: true });
-    toast({
-      title: "Pedido coletado!",
-      description: "O status foi atualizado com sucesso.",
-    });
   };
 
   const handleDeleteSale = (saleId: string) => {
     deleteSale(saleId);
-    toast({
-      title: "Venda deletada!",
-      description: "A venda foi removida e o estoque foi restaurado.",
-      variant: "destructive",
-    });
+    setDeleteDialogOpen(false);
+    setSaleToDelete(null);
+  };
+
+  const openDeleteDialog = (saleId: string) => {
+    setSaleToDelete(saleId);
+    setDeleteDialogOpen(true);
   };
 
   const formatPrice = (price: number) => {
@@ -51,8 +51,13 @@ export const SalesTab: React.FC = () => {
   const reservations = sales.filter(sale => sale.isReservation);
   const regularSales = sales.filter(sale => !sale.isReservation);
 
-  const getTotalStock = () => {
-    return products.reduce((total, product) => total + product.stock, 0);
+  const getTotalProfit = () => {
+    return sales.reduce((total, sale) => {
+      const saleTotal = sale.isPromotion && sale.promotionPrice 
+        ? sale.promotionPrice 
+        : sale.total;
+      return total + saleTotal;
+    }, 0);
   };
 
   return (
@@ -70,7 +75,7 @@ export const SalesTab: React.FC = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Package className="w-5 h-5" />
-            Estoque Atual
+            Estoque e Lucro
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
@@ -86,9 +91,12 @@ export const SalesTab: React.FC = () => {
           </div>
           <Separator className="my-3" />
           <div className="flex justify-between items-center">
-            <span className="font-semibold text-foreground">Total em Estoque:</span>
-            <Badge variant="outline" className="bg-accent/20 text-accent-foreground">
-              {getTotalStock()} unidades
+            <span className="font-semibold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Lucro Total:
+            </span>
+            <Badge variant="outline" className="bg-success/20 text-success-foreground">
+              {formatPrice(getTotalProfit())}
             </Badge>
           </div>
         </CardContent>
@@ -168,15 +176,33 @@ export const SalesTab: React.FC = () => {
                       Marcar como Coletado
                     </Button>
                   )}
-                  <Button
-                    onClick={() => handleDeleteSale(sale.id)}
-                    size="sm"
-                    variant="destructive"
-                    className="flex-1"
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Deletar
-                  </Button>
+                  <AlertDialog open={deleteDialogOpen && saleToDelete === sale.id} onOpenChange={setDeleteDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        onClick={() => openDeleteDialog(sale.id)}
+                        size="sm"
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Deletar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja deletar esta reserva? O estoque será restaurado automaticamente.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteSale(sale.id)}>
+                          Deletar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </CardContent>
             </Card>
@@ -234,15 +260,33 @@ export const SalesTab: React.FC = () => {
                   )}
                 </div>
                 
-                <Button
-                  onClick={() => handleDeleteSale(sale.id)}
-                  size="sm"
-                  variant="destructive"
-                  className="w-full"
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Deletar Venda
-                </Button>
+                <AlertDialog open={deleteDialogOpen && saleToDelete === sale.id} onOpenChange={setDeleteDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      onClick={() => openDeleteDialog(sale.id)}
+                      size="sm"
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Deletar Venda
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja deletar esta venda? O estoque será restaurado automaticamente.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteSale(sale.id)}>
+                        Deletar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
           ))

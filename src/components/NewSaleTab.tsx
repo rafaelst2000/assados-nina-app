@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, Minus, ShoppingCart, User, Percent } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { SaleItem } from '@/types';
-import { toast } from '@/hooks/use-toast';
+
 
 export const NewSaleTab: React.FC = () => {
   const { products, addSale } = useApp();
@@ -52,20 +52,10 @@ export const NewSaleTab: React.FC = () => {
 
   const handleCreateSale = () => {
     if (Object.keys(selectedItems).length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione pelo menos um produto para criar a venda.",
-        variant: "destructive",
-      });
       return;
     }
 
     if (isReservation && !customerName.trim()) {
-      toast({
-        title: "Erro",
-        description: "Para reservas, é necessário informar o nome do cliente.",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -99,11 +89,6 @@ export const NewSaleTab: React.FC = () => {
     setIsPaid(false);
     setIsPromotion(false);
     setPromotionPrice('');
-
-    toast({
-      title: "Venda criada!",
-      description: isReservation ? "Reserva registrada com sucesso." : "Venda registrada com sucesso.",
-    });
   };
 
   const selectedProductIds = Object.keys(selectedItems);
