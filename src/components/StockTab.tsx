@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Save, Package2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';;
 
 export const StockTab: React.FC = () => {
   const { products, updateStock } = useApp();
@@ -24,11 +24,6 @@ export const StockTab: React.FC = () => {
     Object.entries(stockValues).forEach(([productId, value]) => {
       const quantity = parseInt(value) || 0;
       updateStock(productId, quantity);
-    });
-    
-    toast({
-      title: "Estoque atualizado!",
-      description: "Todas as quantidades foram salvas com sucesso.",
     });
   };
 
