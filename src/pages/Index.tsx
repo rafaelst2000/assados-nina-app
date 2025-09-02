@@ -23,9 +23,9 @@ const Index = () => {
 
   return (
     <div className="min-h-dvh bg-background">
-      <main className="min-h-dvh ">
+      <main className="h-[calc(100dvh-85px)]">
         {isLoading ? (
-          <div className="flex items-center justify-center min-h-dvh ">
+          <div className="flex items-center justify-center h-[calc(100dvh-85px)]">
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
               <p className="text-muted-foreground">Carregando produtos...</p>
