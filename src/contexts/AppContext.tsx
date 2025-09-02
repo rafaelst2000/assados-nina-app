@@ -180,9 +180,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         productId: product.id,
         quantity: 0
       }));
-      
       await updateAllStock(resetStock);
       
+      setActiveTab('stock')
       console.log('Dia finalizado com sucesso');
     } catch (error) {
       console.error('Erro ao finalizar o dia:', error);
