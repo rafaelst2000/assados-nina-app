@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Sale, SaleItem } from '@/types';
-import { doc, setDoc, getDoc, query, collection, orderBy, onSnapshot, getDocs, where, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, query, collection, orderBy, onSnapshot, getDocs, where, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface AppContextType {
@@ -10,8 +10,8 @@ interface AppContextType {
   updateStock: (productId: string, quantity: number) => void;
   updateAllStock: (stockUpdates: { productId: string; quantity: number }[]) => void;
   addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => void;
-  markSaleAsCollected: (saleId: string) => void;
-  deleteSale: (saleId: string) => void;
+  markSaleAsCollected: (sale: Sale) => void;
+  deleteSale: (sale: Sale) => void;
   getProductById: (id: string) => Product | undefined;
   loadProductsFromFirebase: () => Promise<void>;
   activeTab: string;
@@ -123,10 +123,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     await updateAllStock(updatedProducts)
   };
 
-  const markSaleAsCollected = async (saleId: string) => {
+  const markSaleAsCollected = async (sale: Sale) => {
     const q = query(
       collection(db, "sales"),
-      where("id", "==", saleId)
+      where("id", "==", sale.id)
     );
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
@@ -135,22 +135,27 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       });
     }
   };
-  
-  const deleteSale = (saleId: string) => {
-    const sale = sales.find(s => s.id === saleId);
-    if (sale) {
-      // Restore stock
-      sale.items.forEach(item => {
-        setProducts(prev => 
-          prev.map(product => 
-            product.id === item.productId 
-              ? { ...product, stock: product.stock + item.quantity }
-              : product
-          )
-        );
-      });
-      setSales(prev => prev.filter(s => s.id !== saleId));
-    }
+
+  const deleteSale = async (sale: Sale) => {
+    const updatedProducts = []
+    products.forEach((product) => {
+      const productIndex = sale.items.findIndex(p => p.productId === product.id)
+      updatedProducts.push({
+        productId: product.id,
+        quantity: productIndex > -1 ? product.stock + sale.items[productIndex].quantity : product.stock
+      })
+    })
+    await updateAllStock(updatedProducts)
+
+    const q = query(
+      collection(db, "sales"),
+      where("id", "==", sale.id)
+    );
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (document) => {
+      await deleteDoc(doc(db, "sales", document.id));
+    });
   };
 
   const getProductById = (id: string) => {

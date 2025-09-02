@@ -6,18 +6,19 @@ import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { Sale } from '@/types';
 
 export const SalesTab: React.FC = () => {
   const { sales, products, markSaleAsCollected, deleteSale } = useApp();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState<string | null>(null);
 
-  const handleMarkAsCollected = (saleId: string) => {
-    markSaleAsCollected(saleId);
+  const handleMarkAsCollected = (sale: Sale) => {
+    markSaleAsCollected(sale);
   };
 
-  const handleDeleteSale = (saleId: string) => {
-    deleteSale(saleId);
+  const handleDeleteSale = (sale: Sale) => {
+    deleteSale(sale);
     setDeleteDialogOpen(false);
     setSaleToDelete(null);
   };
@@ -170,7 +171,7 @@ export const SalesTab: React.FC = () => {
                 <div className="flex gap-2">
                   {!sale.isCollected && (
                     <Button
-                      onClick={() => handleMarkAsCollected(sale.id)}
+                      onClick={() => handleMarkAsCollected(sale)}
                       size="sm"
                       variant="outline"
                       className="flex-1"
@@ -200,7 +201,7 @@ export const SalesTab: React.FC = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDeleteSale(sale.id)}>
+                        <AlertDialogAction onClick={() => handleDeleteSale(sale)}>
                           Deletar
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -284,7 +285,7 @@ export const SalesTab: React.FC = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDeleteSale(sale.id)}>
+                      <AlertDialogAction onClick={() => handleDeleteSale(sale)}>
                         Deletar
                       </AlertDialogAction>
                     </AlertDialogFooter>
