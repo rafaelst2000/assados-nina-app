@@ -8,12 +8,12 @@ import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp } 
 import { useApp } from '@/contexts/AppContext';
 
 export const SalesTab: React.FC = () => {
-  const { sales, products, updateSale, deleteSale } = useApp();
+  const { sales, products, markSaleAsCollected, deleteSale } = useApp();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState<string | null>(null);
 
   const handleMarkAsCollected = (saleId: string) => {
-    updateSale(saleId, { isCollected: true });
+    markSaleAsCollected(saleId);
   };
 
   const handleDeleteSale = (saleId: string) => {
@@ -129,11 +129,13 @@ export const SalesTab: React.FC = () => {
                     <p className="text-sm text-muted-foreground">{formatDate(sale.createdAt)}</p>
                   </div>
                   <div className="flex flex-col gap-2">
+                    {!sale.isCollected && (
                     <Badge variant={sale.isPaid ? "default" : "secondary"}>
                       {sale.isPaid ? 'Pago' : 'Não Pago'}
                     </Badge>
+                    )}
                     {sale.isCollected && (
-                      <Badge variant="outline" className="bg-success/20 text-success-foreground">
+                      <Badge variant="outline" className="bg-success text-success-foreground">
                         Coletado
                       </Badge>
                     )}

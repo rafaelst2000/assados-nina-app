@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Sale, SaleItem } from '@/types';
-import { doc, setDoc, getDoc, query, collection, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, query, collection, orderBy, onSnapshot, getDocs, where, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface AppContextType {
@@ -10,7 +10,7 @@ interface AppContextType {
   updateStock: (productId: string, quantity: number) => void;
   updateAllStock: (stockUpdates: { productId: string; quantity: number }[]) => void;
   addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => void;
-  updateSale: (saleId: string, updates: Partial<Sale>) => void;
+  markSaleAsCollected: (saleId: string) => void;
   deleteSale: (saleId: string) => void;
   getProductById: (id: string) => Product | undefined;
   loadProductsFromFirebase: () => Promise<void>;
@@ -123,16 +123,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     await updateAllStock(updatedProducts)
   };
 
-  const updateSale = (saleId: string, updates: Partial<Sale>) => {
-    setSales(prev => 
-      prev.map(sale => 
-        sale.id === saleId 
-          ? { ...sale, ...updates }
-          : sale
-      )
+  const markSaleAsCollected = async (saleId: string) => {
+    const q = query(
+      collection(db, "sales"),
+      where("id", "==", saleId)
     );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      querySnapshot.forEach(async (document) => {
+        await updateDoc(document.ref, { isCollected: true });
+      });
+    }
   };
-
+  
   const deleteSale = (saleId: string) => {
     const sale = sales.find(s => s.id === saleId);
     if (sale) {
@@ -199,7 +202,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       updateStock,
       updateAllStock,
       addSale,
-      updateSale,
+      markSaleAsCollected,
       deleteSale,
       getProductById,
       loadProductsFromFirebase,
