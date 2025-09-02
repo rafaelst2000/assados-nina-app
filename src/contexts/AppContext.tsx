@@ -5,6 +5,7 @@ interface AppContextType {
   products: Product[];
   sales: Sale[];
   updateStock: (productId: string, quantity: number) => void;
+  updateAllStock: (stockUpdates: { productId: string; quantity: number }[]) => void;
   addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => void;
   updateSale: (saleId: string, updates: Partial<Sale>) => void;
   deleteSale: (saleId: string) => void;
@@ -45,6 +46,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           ? { ...product, stock: quantity }
           : product
       )
+    );
+  };
+
+  const updateAllStock = (stockUpdates: { productId: string; quantity: number }[]) => {
+    setProducts(prev => 
+      prev.map(product => {
+        const update = stockUpdates.find(u => u.productId === product.id);
+        return update ? { ...product, stock: update.quantity } : product;
+      })
     );
   };
 
@@ -105,6 +115,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       products,
       sales,
       updateStock,
+      updateAllStock,
       addSale,
       updateSale,
       deleteSale,

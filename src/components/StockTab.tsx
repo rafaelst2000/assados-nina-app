@@ -8,7 +8,7 @@ import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';;
 
 export const StockTab: React.FC = () => {
-  const { products, updateStock } = useApp();
+  const { products, updateAllStock } = useApp();
   const [stockValues, setStockValues] = useState<Record<string, string>>(
     products.reduce((acc, product) => ({
       ...acc,
@@ -21,10 +21,11 @@ export const StockTab: React.FC = () => {
   };
 
   const handleSaveStock = () => {
-    Object.entries(stockValues).forEach(([productId, value]) => {
-      const quantity = parseInt(value) || 0;
-      updateStock(productId, quantity);
-    });
+    const stockUpdates = Object.entries(stockValues).map(([productId, value]) => ({
+      productId,
+      quantity: parseInt(value) || 0
+    }));
+    updateAllStock(stockUpdates);
   };
 
   const formatPrice = (price: number) => {
