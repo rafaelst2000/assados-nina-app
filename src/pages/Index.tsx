@@ -23,9 +23,9 @@ const Index = () => {
 
   return (
     <div className="min-h-dvh bg-background">
-      <main className="h-[calc(100dvh-85px)]">
+      <main className="h-[calc(100dvh-68px)] overflow-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[calc(100dvh-85px)]">
+          <div className="flex items-center justify-center h-[calc(100dvh-68px)] overflow-auto">
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
               <p className="text-muted-foreground">Carregando produtos...</p>
