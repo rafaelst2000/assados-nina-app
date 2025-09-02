@@ -4,14 +4,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp } from 'lucide-react';
+import { ShoppingCart, Clock, CheckCircle2, Trash2, User, Package, TrendingUp, Sunset } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { Sale } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 export const SalesTab: React.FC = () => {
-  const { sales, products, markSaleAsCollected, deleteSale } = useApp();
+  const { sales, products, markSaleAsCollected, deleteSale, finishDay } = useApp();
+  const { toast } = useToast();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState<string | null>(null);
+  const [finishDayDialogOpen, setFinishDayDialogOpen] = useState(false);
 
   const handleMarkAsCollected = (sale: Sale) => {
     markSaleAsCollected(sale);
@@ -26,6 +29,23 @@ export const SalesTab: React.FC = () => {
   const openDeleteDialog = (saleId: string) => {
     setSaleToDelete(saleId);
     setDeleteDialogOpen(true);
+  };
+
+  const handleFinishDay = async () => {
+    try {
+      await finishDay();
+      setFinishDayDialogOpen(false);
+      toast({
+        title: "Dia finalizado!",
+        description: "Todas as vendas foram removidas e o estoque foi resetado.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível finalizar o dia. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -101,6 +121,33 @@ export const SalesTab: React.FC = () => {
               {formatPrice(getTotalProfit())}
             </Badge>
           </div>
+          <Separator className="my-3" />
+          <AlertDialog open={finishDayDialogOpen} onOpenChange={setFinishDayDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full">
+                <Sunset className="w-4 h-4 mr-2" />
+                Finalizar Dia
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Finalizar Dia</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja finalizar o dia? Esta ação irá:
+                  <br />• Remover todas as vendas e reservas
+                  <br />• Resetar todo o estoque para zero
+                  <br />
+                  <strong>Esta ação não pode ser desfeita!</strong>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleFinishDay} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Finalizar Dia
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
 

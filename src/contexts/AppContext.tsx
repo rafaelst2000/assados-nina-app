@@ -14,6 +14,7 @@ interface AppContextType {
   deleteSale: (sale: Sale) => void;
   getProductById: (id: string) => Product | undefined;
   loadProductsFromFirebase: () => Promise<void>;
+  finishDay: () => Promise<void>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
@@ -162,6 +163,33 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return products.find(product => product.id === id);
   };
 
+  const finishDay = async () => {
+    try {
+      // Limpar todas as vendas
+      const salesQuery = query(collection(db, "sales"));
+      const salesSnapshot = await getDocs(salesQuery);
+      
+      const deletePromises = salesSnapshot.docs.map(doc => 
+        deleteDoc(doc.ref)
+      );
+      
+      await Promise.all(deletePromises);
+      
+      // Resetar estoque para zero
+      const resetStock = initialProducts.map(product => ({
+        productId: product.id,
+        quantity: 0
+      }));
+      
+      await updateAllStock(resetStock);
+      
+      console.log('Dia finalizado com sucesso');
+    } catch (error) {
+      console.error('Erro ao finalizar o dia:', error);
+      throw error;
+    }
+  };
+
   const loadProductsFromFirebase = async () => {
     setIsLoading(true);
     try {
@@ -211,6 +239,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       deleteSale,
       getProductById,
       loadProductsFromFirebase,
+      finishDay,
       activeTab,
       setActiveTab
     }}>
