@@ -11,7 +11,7 @@ const Index = () => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'stock':
-        return <StockTab />;
+        return <StockTab onUpdateStock={() => setActiveTab('sales')} />;
       case 'sales':
         return <SalesTab />;
       case 'new-sale':

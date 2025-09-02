@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Sale, SaleItem } from '@/types';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface AppContextType {
   products: Product[];
@@ -49,13 +51,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     );
   };
 
-  const updateAllStock = (stockUpdates: { productId: string; quantity: number }[]) => {
+  const updateAllStock = async (stockUpdates: { productId: string; quantity: number }[]) => {
     setProducts(prev => 
       prev.map(product => {
         const update = stockUpdates.find(u => u.productId === product.id);
         return update ? { ...product, stock: update.quantity } : product;
       })
     );
+    await setDoc(doc(db, 'products', 'items'), { items: stockUpdates });
   };
 
   const addSale = (saleData: Omit<Sale, 'id' | 'createdAt'>) => {

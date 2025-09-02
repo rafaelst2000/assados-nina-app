@@ -5,9 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Save, Package2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';;
+import { toast } from '@/hooks/use-toast';
 
-export const StockTab: React.FC = () => {
+interface StockTabProps {
+  onUpdateStock?: () => void;
+}
+
+export const StockTab: React.FC<StockTabProps> = ({ onUpdateStock }) => {
   const { products, updateAllStock } = useApp();
   const [stockValues, setStockValues] = useState<Record<string, string>>(
     products.reduce((acc, product) => ({
@@ -20,12 +24,13 @@ export const StockTab: React.FC = () => {
     setStockValues(prev => ({ ...prev, [productId]: value }));
   };
 
-  const handleSaveStock = () => {
+  const handleSaveStock = async () => {
     const stockUpdates = Object.entries(stockValues).map(([productId, value]) => ({
       productId,
       quantity: parseInt(value) || 0
     }));
-    updateAllStock(stockUpdates);
+    await updateAllStock(stockUpdates);
+    onUpdateStock();
   };
 
   const formatPrice = (price: number) => {
