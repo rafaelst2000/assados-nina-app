@@ -206,7 +206,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             stock: data.items[index].quantity
           }))
           setProducts(products);
-          setActiveTab('sales');
+
+          const totalQuantity = products.reduce((sum, item) => sum + item.stock, 0);
+          if (totalQuantity > 0) setActiveTab('sales');
         } else {
           setProducts(initialProducts);
         }

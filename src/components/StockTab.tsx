@@ -30,7 +30,9 @@ export const StockTab: React.FC<StockTabProps> = ({ onUpdateStock }) => {
       quantity: parseInt(value) || 0
     }));
     await updateAllStock(stockUpdates);
-    onUpdateStock();
+    
+    const totalQuantity = stockUpdates.reduce((sum, item) => sum + item.quantity, 0);
+    if (totalQuantity > 0) onUpdateStock();
   };
 
   const formatPrice = (price: number) => {
