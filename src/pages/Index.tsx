@@ -7,14 +7,6 @@ import { useApp } from '@/contexts/AppContext';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('stock');
-  const { hasStockAvailable, isLoading } = useApp();
-
-  // Verificar se há estoque disponível e redirecionar para vendas
-  useEffect(() => {
-    if (!isLoading && hasStockAvailable()) {
-      setActiveTab('sales');
-    }
-  }, [hasStockAvailable, isLoading]);
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -23,7 +15,7 @@ const Index = () => {
       case 'sales':
         return <SalesTab />;
       case 'new-sale':
-        return hasStockAvailable() ? <NewSaleTab /> : <StockTab />;
+        return <NewSaleTab />;
       default:
         return <StockTab />;
     }
@@ -32,16 +24,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <main className="min-h-screen">
-        {isLoading ? (
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="text-muted-foreground">Carregando produtos...</p>
-            </div>
-          </div>
-        ) : (
+        {
           renderActiveTab()
-        )}
+        }
       </main>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
