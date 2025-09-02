@@ -53,13 +53,33 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       orderBy("createdAt", "desc")
     );
     const unsub = onSnapshot(q, (querySnapshot) => {
-      console.log('querySnapshot', querySnapshot)
       const sales: Sale[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() as Sale;
         sales.push(data)
       });
       setSales(sales);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "products"),
+    );
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      const items = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const formattedItems = data.items
+        items.push(formattedItems)
+      })
+
+      const formattedProducts = products.map((product, index) => ({
+        ...product,
+        stock: items[0][index].quantity
+      }))
+      setProducts(formattedProducts)
     });
     return () => unsub();
   }, []);
@@ -85,7 +105,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const addSale = async (saleData: Omit<Sale, 'id' | 'createdAt'>) => {
-    console.log()
     const newSale: Sale = {
       ...saleData,
       id: Date.now().toString(),
