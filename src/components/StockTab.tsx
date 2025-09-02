@@ -16,7 +16,7 @@ export const StockTab: React.FC<StockTabProps> = ({ onUpdateStock }) => {
   const [stockValues, setStockValues] = useState<Record<string, string>>(
     products.reduce((acc, product) => ({
       ...acc,
-      [product.id]: product.stock.toString()
+      [product.id]: product?.stock?.toString()
     }), {})
   );
 

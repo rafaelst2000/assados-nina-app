@@ -1,17 +1,21 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Sale, SaleItem } from '@/types';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface AppContextType {
   products: Product[];
   sales: Sale[];
+  isLoading: boolean;
   updateStock: (productId: string, quantity: number) => void;
   updateAllStock: (stockUpdates: { productId: string; quantity: number }[]) => void;
   addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => void;
   updateSale: (saleId: string, updates: Partial<Sale>) => void;
   deleteSale: (saleId: string) => void;
   getProductById: (id: string) => Product | undefined;
+  loadProductsFromFirebase: () => Promise<void>;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
 }
 
 const initialProducts: Product[] = [
@@ -40,6 +44,8 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [sales, setSales] = useState<Sale[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('stock');
 
   const updateStock = (productId: string, quantity: number) => {
     setProducts(prev => 
@@ -113,16 +119,57 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return products.find(product => product.id === id);
   };
 
+  const loadProductsFromFirebase = async () => {
+    setIsLoading(true);
+    try {
+      console.log('Carregando produtos do Firebase...');
+      const docRef = doc(db, 'products', 'items');
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const items = data.items as Product[]
+        if (items && Array.isArray(items)) {
+          const products = initialProducts.map((product, index) => ({
+            ...product,
+            stock: data.items[index].quantity
+          }))
+          setProducts(products);
+          setActiveTab('sales');
+        } else {
+          setProducts(initialProducts);
+        }
+      } else {
+        setProducts(initialProducts);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar produtos do Firebase:', error);
+      console.log('Usando produtos iniciais devido ao erro');
+      setProducts(initialProducts);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Carregar produtos do Firebase na inicialização
+  useEffect(() => {
+    loadProductsFromFirebase();
+  }, []);
+
   return (
     <AppContext.Provider value={{
       products,
       sales,
+      isLoading,
       updateStock,
       updateAllStock,
       addSale,
       updateSale,
       deleteSale,
-      getProductById
+      getProductById,
+      loadProductsFromFirebase,
+      activeTab,
+      setActiveTab
     }}>
       {children}
     </AppContext.Provider>
