@@ -95,7 +95,7 @@ export const SalesTab: React.FC = () => {
               <TrendingUp className="w-4 h-4" />
               Lucro Total:
             </span>
-            <Badge variant="outline" className="bg-success/20 text-success-foreground">
+            <Badge variant="outline" className="bg-success text-success-foreground">
               {formatPrice(getTotalProfit())}
             </Badge>
           </div>
