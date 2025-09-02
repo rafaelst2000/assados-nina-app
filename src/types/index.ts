@@ -12,7 +12,7 @@ export interface SaleItem {
 }
 
 export interface Sale {
-  id: string;
+  id: string ;
   customerName?: string;
   items: SaleItem[];
   total: number;
@@ -21,7 +21,7 @@ export interface Sale {
   isCollected: boolean;
   isPromotion: boolean;
   promotionPrice?: number;
-  createdAt: Date;
+  createdAt: number;
 }
 
 export interface StockEntry {

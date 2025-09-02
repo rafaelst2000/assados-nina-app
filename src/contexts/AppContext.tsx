@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Sale, SaleItem } from '@/types';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, query, collection, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface AppContextType {
@@ -47,6 +47,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('stock');
 
+  useEffect(() => {
+    const q = query(
+      collection(db, "sales"),
+      orderBy("createdAt", "desc")
+    );
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      console.log('querySnapshot', querySnapshot)
+      const sales: Sale[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data() as Sale;
+        sales.push(data)
+      });
+      setSales(sales);
+    });
+    return () => unsub();
+  }, []);
+
   const updateStock = (productId: string, quantity: number) => {
     setProducts(prev => 
       prev.map(product => 
@@ -67,25 +84,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     await setDoc(doc(db, 'products', 'items'), { items: stockUpdates });
   };
 
-  const addSale = (saleData: Omit<Sale, 'id' | 'createdAt'>) => {
+  const addSale = async (saleData: Omit<Sale, 'id' | 'createdAt'>) => {
+    console.log()
     const newSale: Sale = {
       ...saleData,
       id: Date.now().toString(),
-      createdAt: new Date(),
+      createdAt: Number(Date.now()),
     };
+    await setDoc(doc(db, 'sales', newSale.id), newSale);
 
-    // Update stock for sold items
-    saleData.items.forEach(item => {
-      setProducts(prev => 
-        prev.map(product => 
-          product.id === item.productId 
-            ? { ...product, stock: Math.max(0, product.stock - item.quantity) }
-            : product
-        )
-      );
-    });
-
-    setSales(prev => [newSale, ...prev]);
+    const updatedProducts = []
+    products.forEach((product) => {
+      const productIndex = newSale.items.findIndex(p => p.productId === product.id)
+      updatedProducts.push({
+        productId: product.id,
+        quantity: productIndex > -1 ? product.stock - newSale.items[productIndex].quantity : product.stock
+      })
+    })
+    await updateAllStock(updatedProducts)
   };
 
   const updateSale = (saleId: string, updates: Partial<Sale>) => {

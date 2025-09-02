@@ -69,10 +69,10 @@ export const NewSaleTab: React.FC = () => {
     });
 
     const total = calculateTotal();
-    const finalPromotionPrice = isPromotion && promotionPrice ? parseFloat(promotionPrice) : undefined;
+    const finalPromotionPrice = isPromotion && promotionPrice ? parseFloat(promotionPrice) : null;
 
     addSale({
-      customerName: isReservation ? customerName : undefined,
+      customerName: isReservation ? customerName : '',
       items,
       total,
       isReservation,
